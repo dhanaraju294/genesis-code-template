@@ -3,13 +3,15 @@ import { useBookmarks } from "@/contexts/BookmarksContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bookmark, Search, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, Bookmark, Search, Calendar, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const Bookmarks = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBookmark, setSelectedBookmark] = useState<any>(null);
   const { bookmarks } = useBookmarks();
 
   const filteredBookmarks = bookmarks.filter(bookmark =>
@@ -68,7 +70,11 @@ const Bookmarks = () => {
 
         <div className="grid gap-4">
           {filteredBookmarks.map((bookmark) => (
-            <Card key={bookmark.id} className="bg-white/95 backdrop-blur-sm shadow-elegant border-0 hover:shadow-lg transition-all duration-300 hover-scale cursor-pointer">
+            <Card 
+              key={bookmark.id} 
+              className="bg-white/95 backdrop-blur-sm shadow-elegant border-0 hover:shadow-lg transition-all duration-300 hover-scale cursor-pointer"
+              onClick={() => setSelectedBookmark(bookmark)}
+            >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -88,13 +94,6 @@ const Bookmarks = () => {
                       <span className="capitalize">{bookmark.type}</span>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -112,6 +111,50 @@ const Bookmarks = () => {
             </Card>
           )}
         </div>
+
+        {/* Bookmark Detail Dialog */}
+        <Dialog open={!!selectedBookmark} onOpenChange={() => setSelectedBookmark(null)}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            {selectedBookmark && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <DialogTitle className="text-xl">{selectedBookmark.title}</DialogTitle>
+                      <Badge className={getCategoryColor(selectedBookmark.category)}>
+                        {selectedBookmark.category}
+                      </Badge>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedBookmark(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <DialogDescription className="text-left">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {selectedBookmark.date}
+                      </div>
+                      <span>•</span>
+                      <span className="capitalize">{selectedBookmark.type}</span>
+                    </div>
+                    {selectedBookmark.description}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-6">
+                  <h4 className="font-medium mb-3 text-foreground">Content:</h4>
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="text-sm whitespace-pre-wrap">{selectedBookmark.content}</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
