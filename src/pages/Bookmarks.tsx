@@ -118,33 +118,24 @@ const Bookmarks = () => {
             {selectedBookmark && (
               <>
                 <DialogHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <DialogTitle className="text-xl">{selectedBookmark.title}</DialogTitle>
-                      <Badge className={getCategoryColor(selectedBookmark.category)}>
-                        {selectedBookmark.category}
-                      </Badge>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setSelectedBookmark(null)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                  <div className="flex items-center gap-3">
+                    <DialogTitle className="text-xl">{selectedBookmark.title}</DialogTitle>
+                    <Badge className={getCategoryColor(selectedBookmark.category)}>
+                      {selectedBookmark.category}
+                    </Badge>
                   </div>
                   <DialogDescription className="text-left">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {selectedBookmark.date}
-                      </div>
-                      <span>•</span>
-                      <span className="capitalize">{selectedBookmark.type}</span>
-                    </div>
                     {selectedBookmark.description}
                   </DialogDescription>
                 </DialogHeader>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {selectedBookmark.date}
+                  </div>
+                  <span>•</span>
+                  <span className="capitalize">{selectedBookmark.type}</span>
+                </div>
                 <div className="mt-6">
                   <h4 className="font-medium mb-3 text-foreground">Content:</h4>
                   <div className="bg-muted/50 p-4 rounded-lg">
