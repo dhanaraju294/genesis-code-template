@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -12,7 +12,10 @@ import {
   Database,
   Info,
   Play,
-  Pause
+  Pause,
+  Upload,
+  Settings,
+  Trash2
 } from 'lucide-react';
 
 interface AIVAPresentationProps {
@@ -33,6 +36,9 @@ interface Slide {
 const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isDeveloperMode, setIsDeveloperMode] = useState(false);
+  const [slideImages, setSlideImages] = useState<{ [key: string]: string }>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const slides: Slide[] = [
     {
@@ -147,6 +153,34 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
     }
   ];
 
+  // Image upload functionality
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setSlideImages(prev => ({
+          ...prev,
+          [currentSlideData.id]: imageUrl
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = (slideId: string) => {
+    setSlideImages(prev => {
+      const newImages = {...prev};
+      delete newImages[slideId];
+      return newImages;
+    });
+  };
+
+  const triggerImageUpload = () => {
+    fileInputRef.current?.click();
+  };
+
   // Auto-play functionality
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -189,6 +223,15 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
             >
               {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white" />}
             </button>
+            <button
+              onClick={() => setIsDeveloperMode(!isDeveloperMode)}
+              className={`p-2 rounded-full transition-colors ${
+                isDeveloperMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-slate-600 hover:bg-slate-500'
+              }`}
+              title="Developer Mode"
+            >
+              <Settings className="w-4 h-4 text-white" />
+            </button>
           </div>
           <button
             onClick={onClose}
@@ -214,6 +257,45 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
               </div>
             </div>
 
+            {/* Slide Image Display/Upload Section */}
+            {slideImages[currentSlideData.id] ? (
+              <div className="mb-8">
+                <div className="relative group">
+                  <img
+                    src={slideImages[currentSlideData.id]}
+                    alt={`${currentSlideData.title} preview`}
+                    className="w-full h-96 object-cover rounded-2xl shadow-2xl"
+                  />
+                  {isDeveloperMode && (
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => removeImage(currentSlideData.id)}
+                        className="p-2 bg-red-600 hover:bg-red-700 rounded-full text-white transition-colors"
+                        title="Remove image"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : isDeveloperMode ? (
+              <div className="mb-8">
+                <div
+                  onClick={triggerImageUpload}
+                  className="w-full h-64 bg-slate-700/30 rounded-2xl border-2 border-dashed border-slate-600 hover:border-slate-500 transition-colors cursor-pointer group"
+                >
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <Upload className="w-16 h-16 text-slate-400 group-hover:text-slate-300 mb-4 transition-colors" />
+                    <p className="text-slate-400 group-hover:text-slate-300 text-lg mb-2 transition-colors">
+                      Upload Image for {currentSlideData.title}
+                    </p>
+                    <p className="text-slate-500 text-sm">Click to upload a preview image</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             {/* Features Grid */}
             <div className="grid md:grid-cols-2 gap-4">
               {currentSlideData.features.map((feature, index) => (
@@ -228,15 +310,6 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Demo Screenshot Placeholder */}
-            <div className="mt-8 bg-slate-700/30 rounded-xl p-8 border-2 border-dashed border-slate-600">
-              <div className="text-center">
-                <Database className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-400 text-lg">Interactive Demo Preview</p>
-                <p className="text-slate-500 text-sm mt-2">Experience {currentSlideData.title} in action</p>
-              </div>
             </div>
           </div>
 
@@ -282,6 +355,15 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
             </div>
           </div>
         </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
 
         {/* Footer Controls */}
         <div className="flex items-center justify-between p-6 border-t border-slate-700">
