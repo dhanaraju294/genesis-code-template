@@ -8,6 +8,7 @@ interface ChatHistory {
   date: string;
   messageCount: number;
   lastMessage: string;
+  messages: Array<{id: string, text: string, isUser: boolean, timestamp: string}>;
 }
 
 interface HistoryPageProps {
