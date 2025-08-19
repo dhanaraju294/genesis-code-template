@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Shield, Zap, Users, ArrowRight, Link } from 'lucide-react';
+import AIVAPresentation from './AIVAPresentation';
 
 interface HomePageProps {
   onNavigateToLogin: () => void;
@@ -7,6 +8,8 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onNavigateToLogin, onNavigateToSignUp }) => {
+  const [isPresentationOpen, setIsPresentationOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden">
       {/* 3D Background Elements */}
@@ -214,19 +217,26 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigateToLogin, onNavigateToSign
               </div>
             </div>
             
-            {/* Video/Animation Placeholder */}
+            {/* Interactive Presentation */}
             <div className="mt-12 text-center">
-              <div className="bg-slate-700/30 backdrop-blur-sm p-8 rounded-2xl border border-slate-600/30 border-dashed animate-fade-in-up animation-delay-900">
-                <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <span className="text-4xl animate-bounce-subtle">🎥</span>
+              <button
+                onClick={() => setIsPresentationOpen(true)}
+                className="bg-slate-700/30 backdrop-blur-sm p-8 rounded-2xl border border-slate-600/30 border-dashed animate-fade-in-up animation-delay-900 hover:bg-slate-700/50 hover:border-blue-500/50 transition-all duration-500 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 w-full group"
+              >
+                <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse group-hover:bg-blue-600/40 transition-colors">
+                  <span className="text-4xl animate-bounce-subtle group-hover:scale-110 transition-transform">🎥</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2 animate-fade-in-up animation-delay-1000">
+                <h3 className="text-xl font-semibold text-white mb-2 animate-fade-in-up animation-delay-1000 group-hover:text-blue-300 transition-colors">
                   See AIVA in Action
                 </h3>
-                <p className="text-slate-300 animate-fade-in-up animation-delay-1100">
-                  Watch how natural language queries transform into AI-generated insights and recommendations
+                <p className="text-slate-300 animate-fade-in-up animation-delay-1100 group-hover:text-slate-200 transition-colors">
+                  Interactive presentation showcasing all AIVA features and capabilities
                 </p>
-              </div>
+                <div className="mt-4 inline-flex items-center text-blue-400 font-medium group-hover:text-blue-300 transition-colors">
+                  <span>Launch Presentation</span>
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
             </div>
           </div>
         </section>
@@ -737,6 +747,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigateToLogin, onNavigateToSign
         </div>
       </footer>
       </div>
+
+      {/* AIVA Presentation Modal */}
+      <AIVAPresentation 
+        isOpen={isPresentationOpen} 
+        onClose={() => setIsPresentationOpen(false)} 
+      />
     </div>
   );
 };
